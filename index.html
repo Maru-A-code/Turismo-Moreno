@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turismo Moreno — Planificador por Presupuesto</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --primary: #14532d;
+      --primary-light: #dcfce7;
+      --accent: #0f766e;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #14532d 0%, #0f766e 100%);
+      color: #fff;
+      padding: 2rem 1.25rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    header p {
+      max-width: 680px;
+      margin: 0 auto 0.9rem auto;
+      opacity: 0.92;
+      font-size: 0.98rem;
+    }
+
+    .badge-creators {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 0.4rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 1.75rem auto;
+      padding: 0 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .grid-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 0.95rem;
+      background: #fff;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.3rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #166534; }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text);
+      padding: 0.45rem 0.8rem;
+      font-size: 0.82rem;
+    }
+
+    .btn-secondary:hover { background: #cbd5e1; }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .plan-tag {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+
+    .plan-total {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0.35rem 0 0.85rem 0;
+    }
+
+    .stop-item {
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 0;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .stop-item img {
+      width: 68px;
+      height: 68px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+      background: #e2e8f0;
+    }
+
+    .stop-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .stop-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .breakdown {
+      background: #f8fafc;
+      border-radius: 9px;
+      padding: 0.75rem;
+      margin-top: 0.85rem;
+      font-size: 0.85rem;
+    }
+
+    .breakdown div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+    }
+
+    .breakdown div:last-child {
+      margin-bottom: 0;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+      padding-top: 0.35rem;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .place-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place-card img {
+      width: 100%;
+      height: 155px;
+      object-fit: cover;
+      background: #e2e8f0;
+    }
+
+    .place-body {
+      padding: 0.9rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .place-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .link-maps {
+      font-size: 0.82rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 2rem auto;
+      padding: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    footer strong { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Turismo Moreno — Planificador por Presupuesto</h1>
+    <p>Armá tu salida turística en el partido de Moreno calculando comida, plazas, museos y traslados en colectivo o Uber/Remís según tu presupuesto.</p>
+    <div class="badge-creators">
+      Proyecto Universitario · Creado por <strong>Ayelen Martinez, Mariela Acevedo y Wendy Gandarillas</strong>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>1. Configurá tu salida en Moreno</h2>
+      <div class="grid-form">
+        <div>
+          <label for="budget">Presupuesto total ($ ARS)</label>
+          <input type="number" id="budget" value="45000" min="1000" step="1000" />
+        </div>
+        <div>
+          <label for="people">Cantidad de personas</label>
+          <input type="number" id="people" value="2" min="1" max="15" />
+        </div>
+        <div>
+          <label for="origin">Punto de partida</label>
+          <select id="origin">
+            <option value="Centro">Moreno Centro / Estación</option>
+            <option value="Paso del Rey">Paso del Rey</option>
+            <option value="La Reja / Los Robles">La Reja / Los Robles</option>
+            <option value="Francisco Álvarez">Francisco Álvarez</option>
+            <option value="Trujui">Trujui</option>
+          </select>
+        </div>
+        <div>
+          <label for="transport">Medio de transporte</label>
+          <select id="transport">
+            <option value="colectivo">Colectivo (La Perlita / SUBE)</option>
+            <option value="uber">Uber / Remís / Taxi</option>
+            <option value="mixto">Mixto (Colectivo ida + App vuelta)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" id="incComida" checked /> Gastronomía</label>
+        <label class="checkbox-item"><input type="checkbox" id="incPlaza" checked /> Plazas y aire libre</label>
+        <label class="checkbox-item"><input type="checkbox" id="incMuseo" checked /> Museos y cultura</label>
+        <div style="margin-left: auto;">
+          <button class="btn" onclick="renderPlans()">Calcular opciones de salida</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultsSection">
+      <h2 style="margin-bottom: 1rem; color: var(--primary);">2. Opciones sugeridas dentro de tu presupuesto</h2>
+      <div class="plans-grid" id="plansContainer"></div>
+    </section>
+
+    <section class="card" style="margin-top: 1.5rem;">
+      <h2>3. Parámetros de transporte (Editables para simulación)</h2>
+      <div class="grid-form">
+        <div>
+          <label for="busShort">Colectivo tramo corto ($)</label>
+          <input type="number" id="busShort" value="1276" onchange="renderPlans()" />
+        </div>
+        <div>
+          <label for="busMed">Colectivo tramo medio ($)</label>
+          <input type="number" id="busMed" value="1435" onchange="renderPlans()" />
+        </div>
+        <div>
+          <label for="busLong">Colectivo tramo largo ($)</label>
+          <input type="number" id="busLong" value="1595" onchange="renderPlans()" />
+        </div>
+        <div>
+          <label for="uberBase">Uber/Remís bajada base ($)</label>
+          <input type="number" id="uberBase" value="2200" onchange="renderPlans()" />
+        </div>
+        <div>
+          <label for="uberKm">Uber/Remís valor por km ($)</label>
+          <input type="number" id="uberKm" value="850" onchange="renderPlans()" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Catálogo de lugares de Moreno (Precios colaborativos y fotos reales)</h2>
+      <p style="font-size: 0.88rem; color: var(--muted); margin-bottom: 0.75rem;">
+        Podés actualizar el precio estimado de cada lugar en vivo o reemplazar las rutas <code>img/...</code> por fotos locales descargadas de Turismo Moreno.
+      </p>
+      <div class="catalog-grid" id="catalogContainer"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>Turismo Moreno — Planificador Inteligente por Presupuesto</strong></p>
+    <p>Trabajo Práctico Universitario · Creado por <strong>Ayelen Martinez, Mariela Acevedo y Wendy Gandarillas</strong></p>
+  </footer>
+
+  <script>
+    const FALLBACK_IMG = "https://www.gba.gob.ar/sites/default/files/img_noti_comirec/Parque%20municipal%20Los%20Robles.jpg";
+    const STORAGE_KEY = "turismo_moreno_prices_v1";
+
+    const ZONE_DIST_KM = {
+      "Centro|Centro": 1.5,
+      "Centro|Paso del Rey": 3.5,
+      "Centro|La Reja / Los Robles": 9.5,
+      "Centro|Francisco Álvarez": 8.0,
+      "Centro|Trujui": 7.5,
+      "Paso del Rey|Paso del Rey": 1.5,
+      "Paso del Rey|La Reja / Los Robles": 12.0,
+      "Paso del Rey|Francisco Álvarez": 11.0,
+      "Paso del Rey|Trujui": 9.0,
+      "La Reja / Los Robles|La Reja / Los Robles": 2.0,
+      "La Reja / Los Robles|Francisco Álvarez": 5.5,
+      "La Reja / Los Robles|Trujui": 14.0,
+      "Francisco Álvarez|Francisco Álvarez": 2.0,
+      "Francisco Álvarez|Trujui": 12.5,
+      "Trujui|Trujui": 2.0
+    };
+
+    const CATEGORY_LABELS = {
+      plaza: "Plaza / Aire libre",
+      museo: "Museo / Cultura",
+      comida: "Gastronomía"
+    };
+
+    const PLACES = [
+      {
+        id: "dique-roggero",
+        name: "Dique Ing. Roggero y Lago San Francisco",
+        zone: "La Reja / Los Robles",
+        category: "plaza",
+        pricePerPerson: 0,
+        photo: "img/dique-roggero.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Dique+Ingeniero+Roggero+Moreno",
+        buses: "La Perlita Ramal 26 / 28"
+      },
+      {
+        id: "reserva-los-robles",
+        name: "Reserva Natural Municipal Los Robles",
+        zone: "La Reja / Los Robles",
+        category: "plaza",
+        pricePerPerson: 0,
+        photo: "img/los-robles.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Reserva+Natural+Los+Robles+Moreno",
+        buses: "La Perlita Ramal 26"
+      },
+      {
+        id: "plaza-san-martin",
+        name: "Plaza Mariano Moreno y Centro Histórico",
+        zone: "Centro",
+        category: "plaza",
+        pricePerPerson: 0,
+        photo: "img/plaza-moreno.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Plaza+Mariano+Moreno+Moreno+Buenos+Aires",
+        buses: "Varias líneas locales y regionales"
+      },
+      {
+        id: "museo-alcorta",
+        name: "Museo Histórico Amancio Alcorta",
+        zone: "Centro",
+        category: "museo",
+        pricePerPerson: 0,
+        photo: "img/museo-alcorta.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Museo+Historico+Amancio+Alcorta+Moreno",
+        buses: "Cercanía Estación Moreno"
+      },
+      {
+        id: "rancho-los-estribos",
+        name: "Casa Museo Rancho Los Estribos",
+        zone: "La Reja / Los Robles",
+        category: "museo",
+        pricePerPerson: 0,
+        photo: "img/los-estribos.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Rancho+Los+Estribos+La+Reja+Moreno",
+        buses: "La Perlita Ramal 26 / 28"
+      },
+      {
+        id: "patio-gastronomico-robles",
+        name: "Patio Gastronómico / Food Trucks",
+        zone: "La Reja / Los Robles",
+        category: "comida",
+        pricePerPerson: 9500,
+        photo: "img/gastro-robles.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Los+Robles+Moreno+gastronomia",
+        buses: "La Perlita Ramal 26"
+      },
+      {
+        id: "merienda-centro-moreno",
+        name: "Cafetería o Lomoteca en Moreno Centro",
+        zone: "Centro",
+        category: "comida",
+        pricePerPerson: 11000,
+        photo: "img/gastro-centro.jpg",
+        mapsUrl: "https://www.google.com/maps/search/?api=1&query=Gastronomia+Moreno+Centro",
+        buses: "Líneas urbanas hacia Centro"
+      }
+    ];
+
+    function loadSavedPrices() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        PLACES.forEach((p) => {
+          if (typeof saved[p.id] === "number" && saved[p.id] >= 0) {
+            p.pricePerPerson = saved[p.id];
+          }
+        });
+      } catch (_) {}
+    }
+
+    function savePrice(id, value) {
+      const place = PLACES.find((p) => p.id === id);
+      if (!place) return;
+      const clean = Math.max(0, Number(value) || 0);
+      place.pricePerPerson = clean;
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        saved[id] = clean;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      } catch (_) {}
+      renderPlans();
+    }
+
+    function getDistanceKm(z1, z2) {
+      return ZONE_DIST_KM[`${z1}|${z2}`] || ZONE_DIST_KM[`${z2}|${z1}`] || 6.0;
+    }
+
+    function getTransportRates() {
+      return {
+        busShort: Number(document.getElementById("busShort").value) || 1276,
+        busMed: Number(document.getElementById("busMed").value) || 1435,
+        busLong: Number(document.getElementById("busLong").value) || 1595,
+        uberBase: Number(document.getElementById("uberBase").value) || 2200,
+        uberKm: Number(document.getElementById("uberKm").value) || 850
+      };
+    }
+
+    function legCost(km, mode, people, rates) {
+      const busFare = km <= 4 ? rates.busShort : km <= 10 ? rates.busMed : rates.busLong;
+      const busTotal = busFare * people;
+      const uberTotal = rates.uberBase + km * rates.uberKm;
+
+      if (mode === "colectivo") return busTotal;
+      if (mode === "uber") return uberTotal;
+      return Math.round((busTotal + uberTotal) / 2);
+    }
+
+    function calculateItineraryCost(stops, origin, people, mode, rates) {
+      let currentZone = origin;
+      let totalKm = 0;
+      let transportCost = 0;
+      let placesCost = 0;
+
+      stops.forEach((stop) => {
+        const km = getDistanceKm(currentZone, stop.zone);
+        totalKm += km;
+        transportCost += legCost(km, mode, people, rates);
+        placesCost += stop.pricePerPerson * people;
+        currentZone = stop.zone;
+      });
+
+      const returnKm = getDistanceKm(currentZone, origin);
+      totalKm += returnKm;
+      transportCost += legCost(returnKm, mode, people, rates);
+
+      return {
+        placesCost,
+        transportCost,
+        totalCost: placesCost + transportCost,
+        totalKm: Number(totalKm.toFixed(1))
+      };
+    }
+
+    function buildCandidatePlans(selectedCats) {
+      const byCat = {
+        plaza: PLACES.filter((p) => p.category === "plaza"),
+        museo: PLACES.filter((p) => p.category === "museo"),
+        comida: PLACES.filter((p) => p.category === "comida")
+      };
+
+      const plans = [];
+
+      if (selectedCats.length === 0) {
+        return byCat.plaza.map((p, idx) => ({
+          tag: `Paseo libre #${idx + 1}`,
+          stops: [p]
+        }));
+      }
+
+      const maxLen = Math.max(...selectedCats.map((c) => byCat[c].length || 1));
+      for (let i = 0; i < maxLen; i++) {
+        const stops = selectedCats
+          .map((cat) => byCat[cat][i % byCat[cat].length])
+          .filter(Boolean);
+        plans.push({
+          tag: i === 0 ? "Ruta equilibrada" : i === 1 ? "Alternativa en otra zona" : `Variante #${i + 1}`,
+          stops
+        });
+      }
+
+      const freeStops = PLACES.filter((p) => p.pricePerPerson === 0 && selectedCats.includes(p.category));
+      if (freeStops.length > 0) {
+        plans.push({
+          tag: "Opción económica",
+          stops: freeStops.slice(0, 2)
+        });
+      }
+
+      return plans.slice(0, 3);
+    }
+
+    function formatARS(n) {
+      return "$" + Math.round(n).toLocaleString("es-AR");
+    }
+
+    function renderPlans() {
+      const budget = Math.max(0, Number(document.getElementById("budget").value) || 0);
+      const people = Math.max(1, Number(document.getElementById("people").value) || 1);
+      const origin = document.getElementById("origin").value;
+      const transport = document.getElementById("transport").value;
+      const rates = getTransportRates();
+
+      const selectedCats = [];
+      if (document.getElementById("incPlaza").checked) selectedCats.push("plaza");
+      if (document.getElementById("incMuseo").checked) selectedCats.push("museo");
+      if (document.getElementById("incComida").checked) selectedCats.push("comida");
+
+      const candidates = buildCandidatePlans(selectedCats);
+      const container = document.getElementById("plansContainer");
+
+      container.innerHTML = candidates.map((plan) => {
+        const calc = calculateItineraryCost(plan.stops, origin, people, transport, rates);
+        const diff = budget - calc.totalCost;
+        const statusText = diff >= 0
+          ? `Dentro del presupuesto (sobran ${formatARS(diff)})`
+          : `Supera el presupuesto por ${formatARS(Math.abs(diff))}`;
+
+        const stopsHtml = plan.stops.map((stop) => `
+          <div class="stop-item">
+            <img src="${stop.photo}" alt="${stop.name}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}';" />
+            <div class="stop-info">
+              <h4>${stop.name}</h4>
+              <div class="stop-meta">${CATEGORY_LABELS[stop.category]} · ${stop.zone}</div>
+              <div class="stop-meta">Entrada/consumo: ${stop.pricePerPerson === 0 ? "Gratis / Libre" : formatARS(stop.pricePerPerson * people) + " (" + people + " pers.)"}</div>
+            </div>
+          </div>
+        `).join("");
+
+        return `
+          <article class="plan-card">
+            <div>
+              <span class="plan-tag">${plan.tag}</span>
+              <h3>Desde ${origin} (${people} ${people === 1 ? "persona" : "personas"})</h3>
+              <div class="plan-total">${formatARS(calc.totalCost)}</div>
+              ${stopsHtml}
+            </div>
+            <div class="breakdown">
+              <div><span>Actividades y comida</span><span>${formatARS(calc.placesCost)}</span></div>
+              <div><span>Traslados (~${calc.totalKm} km ida/vuelta)</span><span>${formatARS(calc.transportCost)}</span></div>
+              <div><span>${statusText}</span><span>${formatARS(budget)}</span></div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById("catalogContainer");
+      container.innerHTML = PLACES.map((place) => `
+        <article class="place-card">
+          <img src="${place.photo}" alt="${place.name}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}';" />
+          <div class="place-body">
+            <div>
+              <span class="plan-tag">${CATEGORY_LABELS[place.category]}</span>
+              <h4>${place.name}</h4>
+              <p class="stop-meta">Zona: ${place.zone}</p>
+              <p class="stop-meta">Colectivos: ${place.buses}</p>
+            </div>
+            <div>
+              <label for="price-${place.id}" style="margin-top:0.65rem;">Precio estimado por persona ($)</label>
+              <input
+                type="number"
+                id="price-${place.id}"
+                value="${place.pricePerPerson}"
+                min="0"
+                step="500"
+                onchange="savePrice('${place.id}', this.value)"
+              />
+              <div class="place-actions">
+                <a class="link-maps" href="${place.mapsUrl}" target="_blank" rel="noopener noreferrer">Ver en Maps</a>
+                <button class="btn btn-secondary" onclick="savePrice('${place.id}', document.getElementById('price-${place.id}').value)">Actualizar</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    loadSavedPrices();
+    renderCatalog();
+    renderPlans();
+  </script>
+</body>
+</html>
